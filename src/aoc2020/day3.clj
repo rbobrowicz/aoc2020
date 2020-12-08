@@ -6,13 +6,14 @@
        (str/split-lines)))
 
 (defn trace-path [terrain x-slope y-slope]
-  (let [path (transient [])]
-    (loop [x 0
-           y-lines terrain]
-      (when-let [y-line (first y-lines)]
-        (conj! path (get y-line (mod x (count y-line))))
-        (recur (+ x x-slope) (nthrest y-lines y-slope))))
-    (persistent! path)))
+  (loop [x 0
+         y-lines terrain
+         path (transient [])]
+    (if-let [y-line (first y-lines)]
+      (recur (+ x x-slope)
+             (nthrest y-lines y-slope)
+             (conj! path (get y-line (mod x (count y-line)))))
+      (persistent! path))))
 
 (defn count-trees [path]
   (->> path
